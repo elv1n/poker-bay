@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { authActions } from '../../features/auth';
+import { CloseEvent } from 'reconnecting-websocket';
+import { authActions, SocketStatus } from '../../features/auth';
 import { LS, LSKeys } from '../../utils/LS';
 import { gameActions } from '../../features/game';
 import {
@@ -24,11 +25,14 @@ export const useSocket = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const close = () => {
-      console.log('disconnected');
-      setTimeout(() => {
-        socket.reconnect();
-      }, 750);
+    const close = (e: CloseEvent) => {
+      // let enable it for a while backend not stable
+      if (e.reason === 'timeout' && e.target._retryCount > 1) {
+        dispatch(authActions.socket(SocketStatus.Disconnected));
+      }
+    };
+    const open = () => {
+      dispatch(authActions.socket(SocketStatus.Connected));
     };
 
     const onMessage = (msg: MessageEvent) => {
@@ -64,10 +68,12 @@ export const useSocket = () => {
       process();
     };
 
+    socket.addEventListener('open', open);
     socket.addEventListener('close', close);
     socket.addEventListener('message', onMessage);
 
     return () => {
+      socket.removeEventListener('open', open);
       socket.removeEventListener('close', close);
       socket.removeEventListener('message', onMessage);
     };

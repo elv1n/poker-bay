@@ -2,12 +2,15 @@ import React from 'react';
 
 import { Route, Switch } from 'wouter';
 import { makeStyles } from '@material-ui/core/styles';
-import { Game } from './screens/Game/Game';
+import { useSelector } from 'react-redux';
+import { Game } from './screens/Game';
 import { useSocket } from './hooks/useSocket';
 import { Routes } from './constants';
 import { Auth } from './screens/Auth';
 import { AppDrawer } from './components/AppDrawer';
 import { Lobby } from './screens/Lobby';
+import { authSelector, SocketStatus } from './features/auth';
+import { UnderMaintenence } from './components/UnderMaintenence';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -41,6 +44,14 @@ const useStyles = makeStyles(theme => ({
 export const App = () => {
   useSocket();
   useStyles();
+
+  const isDisconnected = useSelector(
+    authSelector.isSocket(SocketStatus.Disconnected)
+  );
+
+  if (isDisconnected) {
+    return <UnderMaintenence />;
+  }
 
   return (
     <>

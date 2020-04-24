@@ -19,9 +19,7 @@ export const MainAction: React.FC<Props> = ({ actions }) => {
   const { raise, autoAction, toggleAutoAction } = useContext(RaiseContext);
   const maxBet = useSelector(gameSelector.get('_maxBet'));
   const player = useSelector(gameSelector.getMyPlayer);
-  const currentActPlayer = useSelector(gameSelector.getCurrentActName);
 
-  const isMyTurn = player._playerName === currentActPlayer;
   const onMove = useMoveCallback();
 
   const mainAction = getMainAction(actions, player, maxBet, raise);
@@ -33,10 +31,10 @@ export const MainAction: React.FC<Props> = ({ actions }) => {
   const blind = actions[PlayerActionType.PostBlind];
   // auto blinds
   useEffect(() => {
-    if (blind && isMyTurn) {
+    if (blind) {
       onMove(blind);
     }
-  }, [blind, onMove, isMyTurn]);
+  }, [blind, onMove]);
 
   useEffect(() => {
     if (isAutoCheck && mainAction) {

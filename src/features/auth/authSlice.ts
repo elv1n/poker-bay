@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../store';
 
@@ -8,36 +9,67 @@ enum AuthStatus {
   Success,
   LoggedOut,
 }
+export enum SocketStatus {
+  NotDefined,
+  Connected,
+  Disconnected,
+}
 
 type AuthedUser = {
   status: AuthStatus.Success;
   username: string;
 };
 
-type AuthState =
-  | { status: AuthStatus.Mounted }
-  | { status: AuthStatus.Pending }
-  | { status: AuthStatus.LoggedOut }
-  | { status: AuthStatus.Error; message: string }
-  | AuthedUser;
+interface BaseAuthState {
+  status: Exclude<AuthStatus, AuthStatus.Success>;
+  socket: SocketStatus;
+  error?: {
+    type: string;
+    message: string;
+  };
+}
 
-const initialState = {
+interface LoggedAuthState extends Omit<BaseAuthState, 'status'> {
+  status: AuthStatus.Success;
+  username: string;
+}
+//
+// type AuthState =
+//   | { status: AuthStatus.Mounted }
+//   | { status: AuthStatus.Pending }
+//   | { status: AuthStatus.LoggedOut }
+//   | { status: AuthStatus.Error; message: string }
+//   | AuthedUser;
+
+type AuthState = BaseAuthState | LoggedAuthState;
+
+const initialState: AuthState = {
   status: AuthStatus.Mounted,
-} as AuthState;
+  socket: SocketStatus.NotDefined,
+};
 
 export const authSlice = createSlice({
   name: 'auth',
-  initialState,
+  initialState: initialState as AuthState,
   reducers: {
     set: (state, action: PayloadAction<string>) => ({
+      ...state,
       status: AuthStatus.Success,
       username: action.payload,
     }),
-    error: (state, action: PayloadAction<string>) => ({
-      status: AuthStatus.Error,
-      message: action.payload,
-    }),
-    logout: state => ({ status: AuthStatus.LoggedOut }),
+    error: (state, action: PayloadAction<string>) => {
+      state.status = AuthStatus.Error;
+      state.error = {
+        type: action.payload,
+        message: action.payload,
+      };
+    },
+    logout: state => {
+      state.status = AuthStatus.LoggedOut;
+    },
+    socket: (state, action: PayloadAction<SocketStatus>) => {
+      state.socket = action.payload;
+    },
   },
 });
 
@@ -53,4 +85,6 @@ export const authSelector = {
   isAuthed: ({ auth }: RootState) => auth.status === AuthStatus.Success,
   isFailed: ({ auth }: RootState) =>
     auth.status === AuthStatus.Error || auth.status === AuthStatus.LoggedOut,
+  isSocket: (status: SocketStatus) => ({ auth }: RootState) =>
+    auth.socket === status,
 };

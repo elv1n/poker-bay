@@ -3,7 +3,7 @@ import { createMuiTheme, darken, lighten } from '@material-ui/core';
 const altMain = '#BEC0DC';
 const main = '#908ae4';
 const textPrimary = '#57618a';
-console.log(lighten, darken);
+
 export const theme = createMuiTheme({
   palette: {
     text: {

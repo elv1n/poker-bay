@@ -39,7 +39,10 @@ const PlayerInGame = () => {
   useEffect(() => {
     // Reset auto for new game
     if (street === GameStreet.PreDeal) {
-      setAutoAction(AutoAction.None);
+      // do not reset leave action
+      setAutoAction(action =>
+        action !== AutoAction.Leave ? action : AutoAction.None
+      );
     }
   }, [street]);
 
