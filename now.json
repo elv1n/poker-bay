@@ -1,7 +1,0 @@
-{
-  "env": {
-    "NODE_ENV": "production",
-    "REACT_APP_SOCKET": "ws://134.122.0.176/socket",
-    "REACT_APP_API": "http://134.122.0.176/api"
-  }
-}
