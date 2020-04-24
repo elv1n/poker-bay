@@ -45,6 +45,7 @@
     "@types/react-redux": "^7.1.7",
     "@types/react-transition-group": "^4.2.4",
     "eslint-config-elv1n-react": "^0.6.0",
+    "local-web-server": "^4.0.0",
     "react-scripts": "3.4.1",
     "typescript": "~3.8.2"
   },
