@@ -49,7 +49,7 @@ export const Auth = () => {
     setPending(true);
     makeRequest(register ? AuthType.register : AuthType.login, data).catch(
       e => {
-        setError(e.response.data);
+        setError(e.response?.data || e.message);
         setPending(false);
       }
     );
