@@ -10,11 +10,11 @@ import {
 import { Link as RouteLink, Redirect } from 'wouter';
 import { makeStyles } from '@material-ui/core/styles';
 import { Alert } from '@material-ui/lab';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { BigButton } from '../../components/BigButton';
 import { LS, LSKeys } from '../../utils/LS';
-import { authSelector } from '../../features/auth/authSlice';
+import { authActions, authSelector } from '../../features/auth/authSlice';
 import { AuthPayload, AuthType, makeRequest } from './helpers';
 import { Routes } from '../../constants';
 
@@ -28,6 +28,7 @@ const useStyles = makeStyles({
 });
 
 export const Auth = () => {
+  const dispatch = useDispatch();
   const classes = useStyles();
 
   const isAuthed = useSelector(authSelector.isAuthed);
@@ -47,12 +48,14 @@ export const Auth = () => {
       return;
     }
     setPending(true);
-    makeRequest(register ? AuthType.register : AuthType.login, data).catch(
-      e => {
+    makeRequest(register ? AuthType.register : AuthType.login, data)
+      .then(() => {
+        dispatch(authActions.set(LS.getUsername()));
+      })
+      .catch(e => {
         setError(e.response?.data || e.message);
         setPending(false);
-      }
-    );
+      });
   };
   const setData = (newData: Partial<AuthPayload>) =>
     setDataInt(data => ({ ...data, ...newData }));
@@ -107,6 +110,7 @@ export const Auth = () => {
               label="Password"
               margin="normal"
               onChange={({ target: { value } }) => setData({ pwd: value })}
+              type="password"
               value={data.pwd}
               variant="outlined"
             />

@@ -33,8 +33,8 @@ export function makeRequest(
         }
       : {
           newUsername: payload.login,
-          newUserEmail: payload.pwd,
-          newUserPassword: payload.email,
+          newUserEmail: payload.email,
+          newUserPassword: payload.pwd,
         };
 
   return new Promise((res, rej) => {
